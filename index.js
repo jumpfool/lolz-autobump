@@ -43,21 +43,50 @@ function prompt(question) {
 async function setupWizard() {
   logger.logGreen("lolz autobump bot");
   console.log("запуск настройки...");
-  const token = await prompt("введите токен telegram бота: ");
+
+  // Check for environment variables first (for Docker deployment)
+  let token = process.env.BOT_TOKEN;
+  let adminId = process.env.ADMIN_ID;
+  let lolzToken = process.env.LOLZ_API_TOKEN;
+
+  // If environment variables are not set, prompt user
+  if (!token) {
+    token = await prompt("введите токен telegram бота: ");
+  } else {
+    console.log(
+      "токен telegram бота загружен из переменной окружения BOT_TOKEN",
+    );
+  }
+
   if (!token || token.trim() === "") {
     console.log("ошибка: токен бота обязателен");
     process.exit(1);
   }
-  const adminId = await prompt("введите id администратора: ");
+
+  if (!adminId) {
+    adminId = await prompt("введите id администратора: ");
+  } else {
+    console.log("id администратора загружен из переменной окружения ADMIN_ID");
+  }
+
   if (!adminId || isNaN(parseInt(adminId))) {
     console.log("ошибка: id администратора должен быть числом");
     process.exit(1);
   }
-  const lolzToken = await prompt("введите токен lolz.live api: ");
+
+  if (!lolzToken) {
+    lolzToken = await prompt("введите токен lolz.live api: ");
+  } else {
+    console.log(
+      "токен lolz.live api загружен из переменной окружения LOLZ_API_TOKEN",
+    );
+  }
+
   if (!lolzToken || lolzToken.trim() === "") {
     console.log("ошибка: токен lolz.live api обязателен");
     process.exit(1);
   }
+
   const configData = {
     botToken: token.trim(),
     adminId: parseInt(adminId),
